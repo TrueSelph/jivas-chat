@@ -1,0 +1,7 @@
+spec:
+  name: jivas_chat
+  services:
+    - name: jivas_chat
+      git:
+        branch: main
+        repo_clone_url: https://github.com/deiucanta/chatpad.git
