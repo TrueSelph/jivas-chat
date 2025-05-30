@@ -1,0 +1,1 @@
+ALTER TABLE "threads" ADD COLUMN "agentId" text NOT NULL;

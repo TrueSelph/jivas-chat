@@ -1,0 +1,17 @@
+.root {
+	&:hover {
+		transition: background-color 0.1s ease-in-out;
+		background-color: light-dark(
+			var(--mantine-color-gray-2),
+			var(--mantine-color-dark-8)
+		);
+	}
+}
+
+.active {
+	transition: background-color 0.2s ease;
+	background-color: light-dark(
+		var(--mantine-color-gray-2),
+		var(--mantine-color-dark-8)
+	);
+}

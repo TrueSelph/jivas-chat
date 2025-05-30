@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useChatId } from "../hooks/useChatId";
 import { ChatItem } from "./ChatItem";
 import { useQuery } from "@tanstack/react-query";
+import { useLoaderData } from "react-router";
 
 export type Frame = {
 	id: string;
@@ -16,24 +17,25 @@ export type Frame = {
 export function Chats({ search }: { search: string }) {
 	const chatId = useChatId();
 	const settings = JSON.parse(localStorage.getItem("settings") || "{}");
+	const { frames: chats } = useLoaderData<{ frames: Frame[] }>();
 
-	const { data: chats } = useQuery({
-		queryKey: ["frames"],
-		queryFn: () =>
-			fetch(`${settings?.jivasHost}/walker/get_frames`, {
-				method: "POST",
-				body: JSON.stringify({
-					agent_id: settings?.jivasAgent,
-				}),
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${settings?.token}`,
-				},
-			})
-				.then(async (res) => await res.json())
-				.then((res) => res.reports as Frame[]),
-		enabled: !!settings?.token,
-	});
+	// const { data: chats } = useQuery({
+	// 	queryKey: ["frames"],
+	// 	queryFn: () =>
+	// 		fetch(`${settings?.jivasHost}/walker/get_frames`, {
+	// 			method: "POST",
+	// 			body: JSON.stringify({
+	// 				agent_id: settings?.jivasAgent,
+	// 			}),
+	// 			headers: {
+	// 				"Content-Type": "application/json",
+	// 				Authorization: `Bearer ${settings?.token}`,
+	// 			},
+	// 		})
+	// 			.then(async (res) => await res.json())
+	// 			.then((res) => res.reports as Frame[]),
+	// 	enabled: !!settings?.token,
+	// });
 
 	const filteredChats = useMemo(
 		() =>

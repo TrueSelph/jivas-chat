@@ -1,14 +1,10 @@
 import {
-	Badge,
 	Box,
 	Button,
-	Center,
 	Container,
 	Group,
-	SimpleGrid,
 	Stack,
 	Text,
-	ThemeIcon,
 	Title,
 } from "@mantine/core";
 import {
@@ -21,7 +17,6 @@ import {
 import { Logo } from "../components/Logo";
 import { SettingsModal } from "../components/SettingsModal";
 import { config } from "../utils/config";
-import { useQueryOne } from "@triplit/react";
 import { ChatInput } from "./ChatRoute";
 import { nanoid } from "nanoid";
 import { useState } from "react";

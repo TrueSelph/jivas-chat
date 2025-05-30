@@ -11,18 +11,11 @@ import {
 	ActionIcon,
 	rem,
 } from "@mantine/core";
-import { useMemo, useState, type ChangeEvent } from "react";
-import { AiOutlineSend } from "react-icons/ai";
+import { useMemo, useState } from "react";
 import { MessageItem } from "../components/MessageItem";
 import { useChatId } from "../hooks/useChatId";
-import { streamInteract } from "../utils/openai";
-import {
-	useMutation,
-	useMutationState,
-	useQuery,
-	useQueryClient,
-} from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-location";
+import { useMutationState, useQuery } from "@tanstack/react-query";
+import { ChatInput } from "~/components/ChatInput";
 
 export type Interaction = {
 	id: string;
@@ -165,145 +158,5 @@ export function ChatRoute() {
 				</Container>
 			</Box>
 		</Box>
-	);
-}
-
-export function ChatInput({
-	chatId,
-	setStreamContent,
-}: {
-	chatId: string;
-	setStreamContent: (content: string) => void;
-}) {
-	const [content, setContent] = useState("");
-	const [contentDraft, setContentDraft] = useState("");
-	const [userMsgIndex, setUserMsgIndex] = useState(0);
-	const queryClient = useQueryClient();
-	const navigate = useNavigate();
-
-	const onContentChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-		const { value } = event.currentTarget;
-		setContent(value);
-		setContentDraft(value);
-		setUserMsgIndex(0);
-	};
-
-	const streamMutation = useMutation({
-		mutationKey: ["stream", chatId],
-		mutationFn: async (data: { chatId: string; content: string }) => {
-			setContent("");
-			return await streamInteract(
-				data.chatId,
-				data.content,
-				setStreamContent,
-				(event) => {
-					if (chatId !== event.session_id) {
-						queryClient.refetchQueries({ queryKey: ["frames"] });
-						navigate({ to: `/chats/${event.session_id}`, replace: true });
-					}
-				},
-				queryClient,
-			);
-		},
-		onSettled: () => {},
-		onSuccess: () => {
-			// alert("submitted fully");
-		},
-	});
-
-	// const submit = async () => {
-	// 	if (submitting) return;
-
-	// 	if (!chatId) {
-	// 		notifications.show({
-	// 			title: "Error",
-	// 			color: "red",
-	// 			message: "chatId is not defined. Please create a chat to get started.",
-	// 		});
-	// 		return;
-	// 	}
-
-	// 	// if (!apiKey) {
-	// 	// 	notifications.show({
-	// 	// 		title: "Error",
-	// 	// 		color: "red",
-	// 	// 		message: "OpenAI API Key is not defined. Please set your API Key",
-	// 	// 	});
-	// 	// 	return;
-	// 	// }
-
-	// 	try {
-	// 		setSubmitting(true);
-
-	// 		setSubmitting(false);
-	// 	} catch (error: any) {
-	// 		if (error.toJSON().message === "Network Error") {
-	// 			notifications.show({
-	// 				title: "Error",
-	// 				color: "red",
-	// 				message: "No internet connection.",
-	// 			});
-	// 		}
-	// 		const message = error.response?.data?.error?.message;
-	// 		if (message) {
-	// 			notifications.show({
-	// 				title: "Error",
-	// 				color: "red",
-	// 				message,
-	// 			});
-	// 		}
-	// 	} finally {
-	// 		setSubmitting(false);
-	// 	}
-	// };
-
-	return (
-		<>
-			<Textarea
-				key={chatId}
-				flex={1}
-				placeholder="Your message here..."
-				autosize
-				autoFocus
-				size="lg"
-				radius={"lg"}
-				disabled={streamMutation.status === "pending"}
-				minRows={1}
-				style={{ "--mantine-font-size-lg": rem(16) }}
-				maxRows={5}
-				value={content}
-				onChange={onContentChange}
-				onKeyDown={async (event) => {
-					if (event.code === "Enter" && !event.shiftKey) {
-						event.preventDefault();
-						streamMutation.mutate({ chatId, content });
-						setUserMsgIndex(0);
-					}
-					if (event.code === "ArrowUp") {
-						// onUserMsgToggle(event);
-					}
-					if (event.code === "ArrowDown") {
-						// onUserMsgToggle(event);
-					}
-				}}
-				rightSectionWidth={"auto"}
-				rightSection={
-					<Group h="100%" align="end">
-						<ActionIcon
-							mb="sm"
-							mr="lg"
-							color="gray"
-							h="auto"
-							onClick={() => {
-								streamMutation.mutate({ chatId, content });
-							}}
-						>
-							<AiOutlineSend />
-						</ActionIcon>
-					</Group>
-				}
-			/>
-			{/* <Show largerThan="sm" styles={{ display: "none" }}> */}
-		</>
 	);
 }

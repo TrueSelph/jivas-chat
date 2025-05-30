@@ -2,7 +2,7 @@ import { Button, Modal, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-location";
-import { cloneElement, ReactElement, useEffect, useState } from "react";
+import { cloneElement, useEffect, useState, type ReactNode } from "react";
 import { useApiKey } from "../hooks/useApiKey";
 import { useChatId } from "../hooks/useChatId";
 import { Frame } from "./Chats";
@@ -13,7 +13,7 @@ export function DeleteChatModal({
 	children,
 }: {
 	chat: Frame;
-	children: ReactElement;
+	children: ReactNode;
 }) {
 	const [opened, { open, close }] = useDisclosure(false);
 	const [submitting, setSubmitting] = useState(false);

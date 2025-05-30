@@ -1,7 +1,7 @@
 import { Button, Modal, Stack, TextInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { cloneElement, ReactElement, useEffect, useState } from "react";
+import { cloneElement, useEffect, useState, type ReactNode } from "react";
 import { Frame } from "./Chats";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -10,7 +10,7 @@ export function EditChatModal({
 	children,
 }: {
 	chat: Frame;
-	children: ReactElement;
+	children: ReactNode;
 }) {
 	const [opened, { open, close }] = useDisclosure(false);
 	const [submitting, setSubmitting] = useState(false);

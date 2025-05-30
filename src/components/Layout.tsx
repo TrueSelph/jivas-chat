@@ -2,11 +2,8 @@ import {
 	ActionIcon,
 	AppShell,
 	Box,
-	Burger,
 	Button,
-	Center,
 	Flex,
-	Header,
 	// MediaQuery,
 	// Navbar,
 	rem,
@@ -19,10 +16,6 @@ import {
 	useMantineTheme,
 } from "@mantine/core";
 import {
-	IconBrandGithub,
-	IconBrandTwitter,
-	IconDatabase,
-	IconMessage,
 	IconMoonStars,
 	IconPlus,
 	IconSearch,
@@ -30,15 +23,11 @@ import {
 	IconSunHigh,
 	IconX,
 } from "@tabler/icons-react";
-import { Link, Outlet, useNavigate, useRouter } from "@tanstack/react-location";
-import { useLiveQuery } from "dexie-react-hooks";
-import { nanoid } from "nanoid";
+import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import { db } from "../db";
 import { useChatId } from "../hooks/useChatId";
 import { Chats } from "./Chats";
 import { CreatePromptModal } from "./CreatePromptModal";
-import { DatabaseModal } from "./DatabaseModal";
 // import { LogoText } from "./Logo";
 import { Prompts } from "./Prompts";
 import { SettingsModal } from "./SettingsModal";
@@ -50,13 +39,12 @@ declare global {
 	}
 }
 
-export function Layout() {
+export function Layout({ children }: { children: React.ReactNode }) {
 	const theme = useMantineTheme();
 	const [opened, setOpened] = useState(false);
 	const [tab, setTab] = useState<"Chats" | "Prompts">("Chats");
 	const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-	const navigate = useNavigate();
-	const router = useRouter();
+	const location = useLocation();
 
 	const [search, setSearch] = useState("");
 	const chatId = useChatId();
@@ -72,7 +60,7 @@ export function Layout() {
 
 	useEffect(() => {
 		setOpened(false);
-	}, [router.state.location]);
+	}, [location.pathname]);
 
 	return (
 		<AppShell
@@ -82,8 +70,6 @@ export function Layout() {
 			layout="alt"
 			padding={0}
 		>
-			{/* {JSON.stringify(chats)} */}
-			{/* {chat ? ( */}
 			<AppShell.Header p="xs" className="app-region-drag">
 				<div
 					style={{
@@ -96,7 +82,6 @@ export function Layout() {
 					{/* {`${chat?.description} - ${chat?.totalTokens ?? 0} tokens`} */}
 				</div>
 			</AppShell.Header>
-			{/* ) : undefined} */}
 
 			<AppShell.Navbar visibleFrom="md" hidden={!opened}>
 				<AppShell.Section className="app-region-drag">
@@ -162,9 +147,8 @@ export function Layout() {
 							<Button
 								fullWidth
 								leftSection={<IconPlus size={20} />}
-								onClick={() => {
-									navigate({ to: `/` });
-								}}
+								component={Link}
+								to="/chats"
 							>
 								New Chat
 							</Button>
@@ -241,19 +225,8 @@ export function Layout() {
 					</Flex>
 				</AppShell.Section>
 			</AppShell.Navbar>
-			{/* <MediaQuery largerThan="md" styles={{ display: "none" }}>
-				<Burger
-					opened={opened}
-					onClick={() => setOpened((o) => !o)}
-					size="sm"
-					color={theme.colors.gray[6]}
-					className="app-region-no-drag"
-					sx={{ position: "fixed", top: 16, right: 16, zIndex: 100 }}
-				/>
-			</MediaQuery> */}
-			<AppShell.Main>
-				<Outlet />
-			</AppShell.Main>
+
+			<AppShell.Main>{children}</AppShell.Main>
 		</AppShell>
 	);
 }

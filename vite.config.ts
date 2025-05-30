@@ -1,15 +1,7 @@
-import react from "@vitejs/plugin-react-swc";
+import { reactRouter } from "@react-router/dev/vite";
 import { defineConfig } from "vite";
-// import commonjs from "vite-plugin-commonjs";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-	plugins: [react()],
-	server: {
-		watch: {
-			usePolling: true,
-		},
-		hmr: {
-			overlay: true,
-		},
-	},
+	plugins: [reactRouter(), tsconfigPaths()],
 });

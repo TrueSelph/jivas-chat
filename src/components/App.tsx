@@ -90,10 +90,7 @@ export function App() {
 			]}
 		>
 			<ColorSchemeScript />
-			{/* <ColorSchemeProvider
-        colorScheme={colorScheme}
-        toggleColorScheme={toggleColorScheme}
-      > */}
+
 			<MantineProvider
 				withGlobalStyles
 				withNormalizeCSS

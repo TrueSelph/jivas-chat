@@ -1,0 +1,1 @@
+ALTER TABLE "threads" ADD COLUMN "label" text DEFAULT 'New chat' NOT NULL;

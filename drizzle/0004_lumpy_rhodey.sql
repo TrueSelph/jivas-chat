@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "selectedAgentId" varchar(52);
