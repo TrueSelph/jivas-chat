@@ -6,3 +6,4 @@ notes.txt
 # React Router
 /.react-router/
 /build/
+.env
