@@ -1,7 +1,6 @@
 import { Outlet, redirect } from "react-router";
 import { Layout } from "~/components/Layout";
 import type { Route } from "./+types/chats";
-import type { Frame } from "~/components/Chats";
 import { sessionStorage } from "~/auth.server";
 import {
 	instancesTable,
@@ -69,7 +68,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 	const prompts = await db.select().from(promptsTable);
 	const instances = await db
-		.select({ id: instancesTable.id, name: instancesTable.name })
+		.select({
+			id: instancesTable.id,
+			name: instancesTable.name,
+			email: instancesTable.email,
+			host: instancesTable.host,
+		})
 		.from(instancesTable)
 		.where(eq(instancesTable.userId, user.id));
 
@@ -219,6 +223,41 @@ export async function action({ request }: Route.ActionArgs) {
 			password: sql`pgp_sym_encrypt(${password}, ${process.env.ENCRYPTION_KEY})`,
 			userId: user.id,
 		});
+	}
+
+	if (_action === "editInstance") {
+		const id = formData.get("id") as string;
+		const name = formData.get("name") as string;
+		const host = formData.get("host") as string;
+		const email = formData.get("email") as string;
+		const password = formData.get("password") as string;
+
+		await db
+			.update(instancesTable)
+			.set({
+				email,
+				host,
+				name,
+				password: sql`pgp_sym_encrypt(${password}, ${process.env.ENCRYPTION_KEY})`,
+			})
+			.where(eq(instancesTable.id, id));
+
+		return {};
+	}
+
+	if (_action === "deleteInstance") {
+		const instanceId = formData.get("id") as string;
+
+		await db
+			.delete(instancesTable)
+			.where(
+				and(
+					eq(instancesTable.id, instanceId),
+					eq(instancesTable.userId, user.id),
+				),
+			);
+
+		return {};
 	}
 
 	return {};

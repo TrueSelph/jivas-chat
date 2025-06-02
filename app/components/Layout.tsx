@@ -2,12 +2,12 @@ import {
 	ActionIcon,
 	AppShell,
 	Box,
+	Text,
 	Button,
 	Flex,
+	Group,
 	Modal,
 	PasswordInput,
-	// MediaQuery,
-	// Navbar,
 	rem,
 	ScrollArea,
 	SegmentedControl,
@@ -18,23 +18,25 @@ import {
 	Tooltip,
 	useMantineColorScheme,
 	useMantineTheme,
+	type SelectProps,
 } from "@mantine/core";
+import { modals } from "@mantine/modals";
 import {
+	IconCheck,
 	IconMoonStars,
 	IconPlus,
-	IconRobot,
 	IconRobotFace,
 	IconSearch,
 	IconServer,
 	IconSettings,
 	IconSunHigh,
+	IconTrash,
 	IconX,
 } from "@tabler/icons-react";
 import {
 	Link,
 	useNavigate,
 	useLocation,
-	useFetchers,
 	useFetcher,
 	useRouteLoaderData,
 } from "react-router";
@@ -54,6 +56,13 @@ declare global {
 		todesktop?: any;
 	}
 }
+
+const iconProps = {
+	stroke: 1.5,
+	color: "currentColor",
+	opacity: 0.6,
+	size: 16,
+};
 
 export function Layout({ children }: { children: React.ReactNode }) {
 	const [createInstanceOpened, { open, close }] = useDisclosure(false);
@@ -86,6 +95,36 @@ export function Layout({ children }: { children: React.ReactNode }) {
 	const fetcher = useFetcher();
 	const selectAgentFetcher = useFetcher();
 	const selectInstanceFetcher = useFetcher();
+
+	const renderInstanceOption: SelectProps["renderOption"] = ({
+		option,
+		checked,
+	}) => {
+		return (
+			<Group flex="1" gap="xs" justify="space-between">
+				<Group>
+					{checked && (
+						<IconCheck style={{ marginInlineStart: "auto" }} {...iconProps} />
+					)}
+					{option.label}
+				</Group>
+
+				<Group gap="xs">
+					<EditInstanceAction
+						instance={{
+							name: option.label,
+							id: option.value,
+							email: option.email,
+							host: option.host,
+						}}
+					/>
+					<DeleteInstanceAction
+						instance={{ name: option.label, id: option.value }}
+					/>
+				</Group>
+			</Group>
+		);
+	};
 
 	return (
 		<AppShell
@@ -176,8 +215,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 								data={chatsRouteData?.instances?.map((instance) => ({
 									label: instance.name,
 									value: instance.id,
+									host: instance.host,
+									email: instance.email,
 								}))}
-								rightSectionPointerEvents={"auto"}
+								renderOption={renderInstanceOption}
+								rightSectionPointerEvents={"all"}
+								leftSectionPointerEvents="all"
 								rightSection={
 									<ActionIcon size="sm" onClick={open}>
 										<IconPlus />
@@ -363,5 +406,133 @@ function CreateInstanceModal({
 				</Stack>
 			</fetcher.Form>
 		</Modal>
+	);
+}
+
+function EditInstanceAction({
+	instance,
+}: {
+	instance: { name: string; host: string; email: string; id: string };
+}) {
+	const fetcher = useFetcher();
+
+	useEffect(() => {
+		if (fetcher?.data?.success) {
+			modals?.close("edit-instance");
+		}
+	}, [fetcher?.data?.success]);
+
+	return (
+		<>
+			{/* <Modal
+					opened={opened}
+					onClose={close}
+					title={`Edit Instance - ${instance.name}`}
+					closeOnClickOutside={false}
+				>
+
+				</Modal> */}
+
+			<ActionIcon
+				size="sm"
+				onClick={() =>
+					modals.open({
+						modalId: "edit-instance",
+						title: `Edit Instance - ${instance.name}`,
+						children: (
+							<fetcher.Form method="POST" action={"/chats"}>
+								<Stack>
+									<TextInput
+										name="name"
+										label="Name"
+										defaultValue={instance.name}
+									/>
+									<TextInput
+										name="host"
+										label="Host"
+										defaultValue={instance.host}
+									/>
+									<TextInput
+										type="email"
+										name="email"
+										label="Email"
+										defaultValue={instance.email}
+									/>
+									<PasswordInput name="password" label="Password" />
+
+									<input type="hidden" hidden name="id" value={instance.id} />
+									<input
+										type="hidden"
+										hidden
+										name="_action"
+										value="editInstance"
+									/>
+
+									<Group justify="flex-end" mt="sm">
+										<Button
+											variant="default"
+											onClick={() => {
+												modals.close("edit-instance");
+											}}
+										>
+											Cancel
+										</Button>
+
+										<Button type="submit" loading={fetcher.state !== "idle"}>
+											Update Instance
+										</Button>
+									</Group>
+								</Stack>
+							</fetcher.Form>
+						),
+					})
+				}
+			>
+				<IconSettings {...iconProps} />
+			</ActionIcon>
+		</>
+	);
+}
+
+function DeleteInstanceAction({
+	instance,
+}: {
+	instance: { name: string; id: string };
+}) {
+	const fetcher = useFetcher();
+	const [opened, { open, close }] = useDisclosure(false);
+
+	return (
+		<>
+			<Modal
+				opened={opened}
+				onClose={close}
+				title={`Delete Instance - ${instance.name}`}
+			>
+				<Text>Are you sure you want to delete this instance?</Text>
+
+				<fetcher.Form action="/chats" method="POST">
+					<Group justify="flex-end" mt="lg">
+						<Button variant="default" onClick={close}>
+							Cancel
+						</Button>
+						<input readOnly hidden name="id" value={instance.id} />
+						<Button
+							name="_action"
+							value="deleteInstance"
+							type="submit"
+							loading={fetcher.state !== "idle"}
+							color="red"
+						>
+							Delete Instance
+						</Button>
+					</Group>
+				</fetcher.Form>
+			</Modal>
+
+			<ActionIcon color="red" size="sm" onClick={open}>
+				<IconTrash {...iconProps} />
+			</ActionIcon>
+		</>
 	);
 }

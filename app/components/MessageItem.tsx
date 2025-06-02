@@ -6,6 +6,8 @@ import {
 	CopyButton,
 	Flex,
 	Group,
+	Loader,
+	LoadingOverlay,
 	Table,
 	Text,
 	Tooltip,
@@ -21,7 +23,6 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import "../styles/markdown.scss";
-import { LogoIcon } from "./Logo";
 import { ScrollIntoView } from "./ScrollIntoView";
 import { preprocessLaTeX } from "../utils/latex";
 import { CreatePromptModal } from "./CreatePromptModal";
@@ -74,15 +75,23 @@ export function MessageItem({
 				>
 					<Flex gap="sm">
 						{message.role === "assistant" && (
-							<Box>
-								{avatar ? (
-									<Avatar src={avatar} size={32} />
-								) : (
-									<Avatar
-										src={"https://app.trueselph.com/TS-Block.png"}
-										size={32}
+							<Box pos="relative">
+								<Box pos="relative">
+									{avatar ? (
+										<Avatar src={avatar} size={32} />
+									) : (
+										<Avatar
+											src={"https://app.trueselph.com/TS-Block.png"}
+											size={32}
+										/>
+									)}
+									<LoadingOverlay
+										visible={!message.content?.length}
+										zIndex={1000}
+										overlayProps={{ radius: "xl", blur: 2 }}
+										loaderProps={{ color: "white", type: "oval", size: "xs" }}
 									/>
-								)}
+								</Box>
 							</Box>
 						)}
 						<Box flex={1} className="markdown">

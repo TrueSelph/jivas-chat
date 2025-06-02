@@ -53,7 +53,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 		interactions,
 		thread,
 		avatar:
-			!avatar?.includes("unable") && !!avatar
+			!avatar?.includes?.("unable") && !!avatar
 				? `data:image/png;base64,${avatar}`
 				: "",
 	};

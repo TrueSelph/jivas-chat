@@ -7,6 +7,7 @@ import {
 	ScrollRestoration,
 } from "react-router";
 
+import { ModalsProvider } from "@mantine/modals";
 import type { Route } from "./+types/root";
 import "./app.css";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
@@ -18,13 +19,10 @@ import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useHotkeys, useLocalStorage } from "@mantine/hooks";
 
-import { Layout as Shell } from "~/components/Layout";
-
 import "@mantine/core/styles.css";
 import "@mantine/code-highlight/styles.css";
 import "@mantine/notifications/styles.css";
 import "katex/dist/katex.min.css";
-import type { Frame } from "./components/Chats";
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -178,12 +176,14 @@ export default function App() {
 					},
 				}}
 			>
-				<CodeHighlightAdapterProvider adapter={shikiAdapter}>
-					<Notifications />
-					<QueryClientProvider client={queryClient}>
-						<Outlet />
-					</QueryClientProvider>
-				</CodeHighlightAdapterProvider>
+				<ModalsProvider>
+					<CodeHighlightAdapterProvider adapter={shikiAdapter}>
+						<Notifications />
+						<QueryClientProvider client={queryClient}>
+							<Outlet />
+						</QueryClientProvider>
+					</CodeHighlightAdapterProvider>
+				</ModalsProvider>
 			</MantineProvider>
 		</>
 	);
