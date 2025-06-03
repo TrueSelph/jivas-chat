@@ -219,8 +219,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 									email: instance.email,
 								}))}
 								renderOption={renderInstanceOption}
-								rightSectionPointerEvents={"all"}
-								leftSectionPointerEvents="all"
+								rightSectionPointerEvents={"auto"}
+								leftSectionPointerEvents="auto"
 								rightSection={
 									<ActionIcon size="sm" onClick={open}>
 										<IconPlus />
@@ -424,18 +424,11 @@ function EditInstanceAction({
 
 	return (
 		<>
-			{/* <Modal
-					opened={opened}
-					onClose={close}
-					title={`Edit Instance - ${instance.name}`}
-					closeOnClickOutside={false}
-				>
-
-				</Modal> */}
-
 			<ActionIcon
 				size="sm"
-				onClick={() =>
+				onClick={(e) => {
+					e.stopPropagation();
+
 					modals.open({
 						modalId: "edit-instance",
 						title: `Edit Instance - ${instance.name}`,
@@ -485,8 +478,8 @@ function EditInstanceAction({
 								</Stack>
 							</fetcher.Form>
 						),
-					})
-				}
+					});
+				}}
 			>
 				<IconSettings {...iconProps} />
 			</ActionIcon>
@@ -530,7 +523,14 @@ function DeleteInstanceAction({
 				</fetcher.Form>
 			</Modal>
 
-			<ActionIcon color="red" size="sm" onClick={open}>
+			<ActionIcon
+				color="red"
+				size="sm"
+				onClick={(e) => {
+					e.stopPropagation();
+					open();
+				}}
+			>
 				<IconTrash {...iconProps} />
 			</ActionIcon>
 		</>
