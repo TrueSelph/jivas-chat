@@ -189,6 +189,36 @@ export class Jivas {
 		return res;
 	}
 
+	async transcribe(data: { file: File }) {
+		const { file } = data;
+		const { token } = await this.getToken();
+
+		const formData = new FormData();
+		formData.append("args", "{}");
+		formData.append("module_root", "jivas.agent.action");
+		// formData.append("module_root", "actions.jivas.deepgram_stt_action");
+		formData.append("agent_id", this.agentId);
+		formData.append("walker", "invoke_stt_action");
+		// formData.append("walker", "transcribe_audio");
+		formData.append("attachments", file);
+
+		const res = (await fetch(`${this.host}/action/walker`, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+			body: formData,
+		}).then(async (res) => await res.json())) as
+			| { success: false; message: string }
+			| {
+					success: true;
+					duration: number;
+					transcript: string;
+			  };
+
+		return res;
+	}
+
 	async listAgents() {
 		const { token } = await this.getToken();
 
@@ -211,8 +241,12 @@ export class Jivas {
 		return result;
 	}
 
-	async interact(data: {}) {
+	async interact(data: {}, signal?: AbortSignal) {
 		await this.getToken();
+
+		signal?.addEventListener("abort", () => {
+			console.log("Aborted request to interact");
+		});
 
 		return fetch(`${this.host}/interact`, {
 			method: "POST",
@@ -220,6 +254,7 @@ export class Jivas {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({ ...data, agent_id: this.agentId }),
+			signal,
 		});
 	}
 }

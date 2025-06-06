@@ -5,7 +5,9 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
+	useNavigation,
 } from "react-router";
+import { NavigationProgress, nprogress } from "@mantine/nprogress";
 
 import { ModalsProvider } from "@mantine/modals";
 import type { Route } from "./+types/root";
@@ -23,6 +25,8 @@ import "@mantine/core/styles.css";
 import "@mantine/code-highlight/styles.css";
 import "@mantine/notifications/styles.css";
 import "katex/dist/katex.min.css";
+import "@mantine/nprogress/styles.css";
+import { useEffect } from "react";
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -108,6 +112,12 @@ export default function App() {
 
 	useHotkeys([["mod+J", () => toggleColorScheme()]]);
 
+	const navigation = useNavigation();
+
+	useEffect(() => {
+		navigation.state !== "idle" ? nprogress.start() : nprogress.complete();
+	}, [navigation.state]);
+
 	return (
 		<>
 			<ColorSchemeScript />
@@ -176,6 +186,7 @@ export default function App() {
 					},
 				}}
 			>
+				<NavigationProgress />
 				<ModalsProvider>
 					<CodeHighlightAdapterProvider adapter={shikiAdapter}>
 						<Notifications />

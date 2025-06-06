@@ -12,7 +12,7 @@ export async function action({ request }: Route.ActionArgs) {
 		const user = session.get("user") as { id: string; email: string };
 		const jivas = new Jivas(user);
 
-		const response = await jivas.interact(data);
+		const response = await jivas.interact(data, request.signal);
 
 		// Check if the response from the backend is OK
 		if (!response.ok) {

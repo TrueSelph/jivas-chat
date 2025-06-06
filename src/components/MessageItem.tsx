@@ -13,7 +13,6 @@ import {
 } from "@mantine/core";
 import { CodeHighlight, InlineCodeHighlight } from "@mantine/code-highlight";
 
-import rehypeKatex from "rehype-katex";
 import rehypeMathjax from "rehype-mathjax";
 
 import { IconCopy } from "@tabler/icons-react";

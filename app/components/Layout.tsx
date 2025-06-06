@@ -70,14 +70,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 	const [opened, setOpened] = useState(false);
 	const [tab, setTab] = useState<"Chats" | "Prompts">("Chats");
 	const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-	const navigate = useNavigate();
 	const location = useLocation();
 	const chatsRouteData = useRouteLoaderData(
 		"routes/chats",
 	) as Route.ComponentProps["loaderData"];
 
 	const [search, setSearch] = useState("");
-	const chatId = useChatId();
 
 	// const chat = useLiveQuery(async () => {
 	// 	if (!chatId) return null;

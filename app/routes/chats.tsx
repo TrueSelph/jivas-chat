@@ -1,4 +1,4 @@
-import { Outlet, redirect } from "react-router";
+import { Outlet, redirect, useLoaderData } from "react-router";
 import { Layout } from "~/components/Layout";
 import type { Route } from "./+types/chats";
 import { sessionStorage } from "~/auth.server";
@@ -10,6 +10,7 @@ import {
 } from "~/db/schema";
 import { db, eq, desc, and, sql } from "~/db/db.server";
 import { Jivas } from "~/utils/jivas.server";
+import { useState } from "react";
 
 export const meta: Route.MetaFunction = ({ data }) => {
 	return [{ title: `Chat | Jivas Chat` }];
@@ -191,6 +192,7 @@ export async function action({ request }: Route.ActionArgs) {
 			request.headers.get("cookie"),
 		);
 		const user = session.get("user") as { id: string };
+		const noRedirect = formData.get("noRedirect") === "true";
 		const [userData] = await db
 			.select()
 			.from(usersTable)
@@ -207,7 +209,13 @@ export async function action({ request }: Route.ActionArgs) {
 
 		await jivas.addFrame({ sessionId: thread.sessionId });
 
-		return redirect("/chats/" + thread.sessionId);
+		console.log({ noRedirect });
+
+		if (!noRedirect) {
+			return redirect("/chats/" + thread.sessionId);
+		} else {
+			return Response.json({ success: true, thread });
+		}
 	}
 
 	if (_action === "addInstance") {
@@ -264,9 +272,12 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function Chats() {
+	const loaderData = useLoaderData<typeof loader>();
+	const [allInteractions, setAllInteractions] = useState([]);
+
 	return (
 		<Layout>
-			<Outlet />
+			<Outlet context={{ allInteractions, setAllInteractions }} />
 		</Layout>
 	);
 }

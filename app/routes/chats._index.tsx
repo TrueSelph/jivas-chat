@@ -19,8 +19,11 @@ import { config } from "../utils/config";
 import { nanoid } from "nanoid";
 import { useState } from "react";
 import { ChatInput } from "~/components/ChatInput";
+import { useOutletContext } from "react-router";
 
 export default function IndexRoute() {
+	const { allInteractions, setAllInteractions } = useOutletContext();
+	// const [allInteractions, setAllInteractions] = useState([]);
 	// const settings = JSON.parse(localStorage.getItem("settings") || "{}");
 	const settings = {};
 
@@ -45,10 +48,8 @@ export default function IndexRoute() {
 					</Text>
 					<Box flex={1} w="100%">
 						<ChatInput
-							setSubmitting={setSubmitting}
-							submitting={submitting}
-							chatId={nanoid()}
-							userMessages={[]}
+							chatId={"create"}
+							setAllInteractions={setAllInteractions}
 						/>
 					</Box>
 					{/* <SimpleGrid mt={50} cols={{ base: 1, md: 3 }} spacing={30}>

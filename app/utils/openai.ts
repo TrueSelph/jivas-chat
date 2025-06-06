@@ -34,6 +34,7 @@ export async function streamInteract(
 	// 	sessionId: string;
 	// }) => void,
 	onEvent: (event: { session_id: string; content: string }) => void,
+	abortSignal?: AbortSignal,
 ) {
 	const settings = JSON.parse(localStorage.getItem("settings") || "{}");
 
@@ -87,6 +88,7 @@ export async function streamInteract(
 				verbose: true,
 				streaming: true,
 			}),
+			signal: abortSignal,
 		});
 
 		if (!response.ok) {

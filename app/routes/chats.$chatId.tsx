@@ -14,7 +14,7 @@ import { useMutationState, useQuery } from "@tanstack/react-query";
 import { ChatInput } from "~/components/ChatInput";
 import type { Route } from "./+types/chats.$chatId";
 import type { Frame } from "~/components/Chats";
-import { useFetcher, useRevalidator } from "react-router";
+import { useFetcher, useOutletContext, useRevalidator } from "react-router";
 import { Jivas } from "~/utils/jivas.server";
 import { sessionStorage } from "~/auth.server";
 import { db, eq } from "~/db/db.server";
@@ -93,13 +93,33 @@ export default function ChatRoute({ loaderData }: Route.ComponentProps) {
 	const scheme = useMantineColorScheme();
 	// const revalidator = useRevalidator();
 	const fetcher = useFetcher();
+	const { allInteractions, setAllInteractions } = useOutletContext();
 
-	const [allInteractions, setAllInteractions] = useState(
-		[...(loaderData?.interactions || [])].filter((m) => !!m),
-	);
+	// const [allInteractions, setAllInteractions] = useState(
+	// 	[...(loaderData?.interactions || [])].filter((m) => !!m),
+	// );
 
 	useEffect(() => {
-		setAllInteractions(loaderData?.interactions);
+		setAllInteractions(loaderData?.interactions?.filter((m) => !!m));
+
+		if (
+			!loaderData?.thread?.label ||
+			loaderData?.thread?.label === "New chat"
+		) {
+			const firstInteraction = allInteractions?.[0];
+			const simpleLabel =
+				firstInteraction?.utterance?.split(" ").slice(0, 5).join(" ") ||
+				firstInteraction?.utterance;
+			fetcher.submit(
+				{
+					label: simpleLabel,
+					description: "yooo",
+					sessionId: chatId,
+					_action: "updateFrame",
+				},
+				{ method: "POST", action: "/chats" },
+			);
+		}
 	}, [loaderData?.interactions]);
 
 	// useEffect(() => {
@@ -128,6 +148,7 @@ export default function ChatRoute({ loaderData }: Route.ComponentProps) {
 		>
 			<Container pt="xl" w="100%" pb={40}>
 				<Stack gap="xs">
+					{/* {JSON.stringify(allInteractions)} */}
 					{allInteractions?.map((message) => (
 						<>
 							{typeof message === "object" ? (
